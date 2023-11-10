@@ -223,6 +223,7 @@ mod tests {
 
         ctx.apply(op, Inv, &mut operands)?;
         assert_float_eq!(operands[0][0], expected[0][0], abs_all <= 1e-9);
+        assert_float_eq!(operands[0][1], expected[0][1], abs_all <= 1e-9);
 
         Ok(())
     }
@@ -248,6 +249,34 @@ mod tests {
         // Inv + roundtrip
         ctx.apply(op, Inv, &mut operands)?;
         assert_float_eq!(operands[0][0], input[0][0], abs_all <= 1e-9);
+
+        Ok(())
+    }
+
+    #[test]
+    fn somerc_inv_and_round_trip() -> Result<(), Error> {
+        let mut ctx = Minimal::default();
+        // ctx.register
+        let op = ctx.op("somerc inv lat_0=46.9524055555556 lon_0=7.43958333333333 k_0=1 x_0=2600000 y_0=1200000 ellps=bessel")?;
+
+        let input = [Coor4D::raw(2531098.0, 1167363.0, 452.0, 0.0)];
+        let mut operands = input.clone();
+        let expected = [Coor4D::raw(
+            0.11413236074541264,
+            0.814287372550452,
+            452.0,
+            0.0,
+        )];
+
+        ctx.apply(op, Fwd, &mut operands)?;
+        println!("{:?}", operands[0]);
+        // assert_float_eq!(operands[0][0], expected[0][0], abs_all <= 1e-9);
+        // assert_float_eq!(operands[0][1], expected[0][1], abs_all <= 1e-9);
+
+        // Fwd + roundtrip
+        ctx.apply(op, Inv, &mut operands)?;
+        assert_float_eq!(operands[0][0], input[0][0], abs_all <= 1e-9);
+        assert_float_eq!(operands[0][1], input[0][1], abs_all <= 1e-9);
 
         Ok(())
     }
